@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style type='text/css'>
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'times new roman';
+        }
+
+        a {
+            color: blue;
+        }
+
+        table,
+        th,
+        td {
+            border: .1px solid black;
+            border-collapse: collapse;
+            border-spacing: 0;
+            padding: 6px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>
+        Index of <strong>{{ index }}/</strong>
+    </h1>
+    <hr>
+    {% if not is_root %}
+    <p>
+        <img src={{ url_for("static", filename="fold-up.png" )}} width=25 height=25 />
+        <a href={{ url_for("folder") }}?path={{ parent }}>[parent directory]</a>
+    </p>
+    {% endif %}
+
+    {% if dirs %}
+    <h2>Folders : </h2>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Date Modified</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dir in dirs %}
+            <tr>
+                <td>
+                    <img src={{ url_for("static", filename="folder.png" ) }} width=25 height=25 />
+                    <a href="{{ url_for("folder") }}?path={{ dir[0] }}">
+                        {{ dir[1] }}
+                    </a>
+                </td>
+                <td>{{ dir[2] }}</td>
+                <td>{{ dir[3] }}</td>
+                <td>
+                    <img src={{ url_for("static", filename="download.png" ) }} width=25 height=25 />
+                    <a href="{{ url_for("download") }}?path={{ dir[0] }}">
+                        Download Zip
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <hr>
+
+    {% if files %}
+    <h2>Files : </h2>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Date Modified</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in files %}
+            <tr>
+                <td>
+                    <img src={{ url_for("static", filename="file.png" ) }} width=25 height=25 />
+                    <a href={{ url_for("file") }}?path={{ file[0] }}>
+                        {{ file[1] }}
+                    </a>
+                </td>
+                <td>{{ file[2] }}</td>
+                <td>{{ file[3] }}</td>
+                <td>
+                    <img src={{ url_for("static", filename="download.png" ) }} width=25 height=25 />
+                    <a href="{{ url_for("download") }}?path={{ file[0] }}">
+                        Download
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+
+    <br />
+
+</body>
+
+</html>
