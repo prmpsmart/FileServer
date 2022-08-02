@@ -1,8 +1,30 @@
+# MIT License
+
+# Copyright (c) 2022 Apata Miracle Peter
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
-import PySide6.QtNetwork, socket, resources
-import os, zipfile, datetime, random, base64
+import PySide6.QtNetwork, socket, resources, os, zipfile, datetime, random, base64
 from werkzeug.serving import make_server, BaseWSGIServer
 from flask import Flask, send_file, request, render_template
 
@@ -218,7 +240,7 @@ class Server:
             p = os.path.join(folder, df)
 
             ls = [
-                self.encode(os.path.abspath(p)),
+                f"?path={self.encode(os.path.abspath(p))}&rand={random.randint(0, 2000)}",
                 df,
                 self.get_size(p),
                 datetime.datetime.fromtimestamp(os.path.getmtime(p)).strftime(
@@ -246,7 +268,7 @@ class Server:
 
     def get_request_path(self):
         path = request.args.get("path")
-        return self.decode(path), path
+        return self.escape(self.decode(path)), path
 
     def base(self, path):
         return os.path.basename(path)
@@ -271,22 +293,23 @@ class Server:
         return self.folder(self._path)
 
     def folder(self, folder=""):
+        dirname = self.escape(os.path.dirname(self._path))
+
         if not folder:
             folder, _ = self.get_request_path()
+            if self.escape(self._path) not in folder:
+                return "Path not found!"
 
         dirs, files = self.get_dfs(folder)
         is_root = folder == self._path
 
         parent = ""
+        current = f"?path={self.encode(folder)}&rand={random.randint(0, 2000)}"
         if is_root:
             index = self.base(folder)
         else:
-            dirname = os.path.dirname(self._path).replace(os.path.sep, "/")
-            index = (
-                folder.replace(os.path.sep, "/").replace(dirname, "")
-            )
-            print(index, self._path, dirname, folder)
-            parent = self.encode(os.path.dirname(folder))
+            index = self.escape(folder).replace(dirname, "")
+            parent = f"?path={self.encode(os.path.dirname(folder))}&rand={random.randint(0, 2000)}"
 
         return render_template(
             "file_server.html",
@@ -294,12 +317,18 @@ class Server:
             files=files,
             is_root=is_root,
             parent=parent,
+            current=current,
             index=index,
         )
 
     def file(self):
-        path, _ = self.get_request_path()
-        return send_file(path)
+        file, _ = self.get_request_path()
+        if self.escape(self._path) not in file:
+            return "Path not found!"
+        return send_file(file)
+
+    def escape(self, path: str):
+        return path.replace(os.path.sep, "/")
 
 
 class Window(Server, QWidget):
@@ -355,7 +384,7 @@ class Window(Server, QWidget):
         self.path = Label()
         self.path.setMinimumWidth(300)
         l.addWidget(self.path)
-        self.icons = [QIcon("file"), QIcon("folder")]
+        self.icons = [QIcon("static/file"), QIcon("static/folder")]
         self.icon_texts = ["Browse File", "Browse Folder"]
         self.browse_btn = QPushButton(self.icons[0], self.icon_texts[0])
         self.browse_btn.clicked.connect(self.browse)
@@ -381,7 +410,7 @@ class Window(Server, QWidget):
     @property
     def datetime(self) -> str:
         return datetime.datetime.now().strftime("%A %d/%m/%Y %I/%M/%S %p")
-    
+
     def home(self):
         if os.path.isfile(self._path):
             path = os.path.basename(self._path)
@@ -392,12 +421,11 @@ class Window(Server, QWidget):
                 """
         return super().home()
 
-
     def download(self):
         path, _ = self.get_request_path()
         if os.path.isdir(path):
             path = self.zip(path, True)
-        
+
         self.count += 1
         self.counter.setText(f"{self.count} Downloads")
         return send_file(path, as_attachment=True, attachment_filename=self.base(path))

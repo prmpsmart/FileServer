@@ -12,3 +12,13 @@ Once the server is started, you don't need to switch it off to change the path t
 - it will exclude **\_\_pycache\_\_** folders from the folder given when zipping.
 
 ![](web_page.jpg)
+
+## Scripts
+---
+
+- [main.py](main.py) for the running the server in the  terminal.
+- [qt_main.py](qt_main.py) for the running the server in the  Qt for Python (PySide6).
+- [tk_main.py](tk_main.py) for the running the server in the  tkinter.
+
+![tk_qt](tk_qt.png)
+left-tkinter, right-Qt

@@ -1,4 +1,27 @@
 <!DOCTYPE html>
+<!-- MIT License
+
+Copyright (c) 2022 Apata Miracle Peter
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. -->
+
+
 <html>
 
 <head>
@@ -30,18 +53,22 @@
 
 <body>
     <h1>
-        Index of <strong>{{ index }}/</strong>
+        Index of <strong>{{ index }}/ </strong>
     </h1>
+        <img src={{ url_for("static", filename="download.png" ) }} width=25 height=25 />
+        <a href={{ url_for("download") }}{{ current }}>
+            Download Zip
+        </a>
     <hr>
     {% if not is_root %}
     <p>
         <img src={{ url_for("static", filename="fold-up.png" )}} width=25 height=25 />
-        <a href={{ url_for("folder") }}?path={{ parent }}>[parent directory]</a>
+        <a href={{ url_for("folder") }}{{ parent }}>[parent directory]</a>
     </p>
     {% endif %}
 
     {% if dirs %}
-    <h2>Folders : </h2>
+    <h2>Foldersh : </h2>
     <hr>
     <table>
         <thead>
@@ -57,7 +84,7 @@
             <tr>
                 <td>
                     <img src={{ url_for("static", filename="folder.png" ) }} width=25 height=25 />
-                    <a href="{{ url_for("folder") }}?path={{ dir[0] }}">
+                    <a href="{{ url_for("folder") }}{{ dir[0] }}">
                         {{ dir[1] }}
                     </a>
                 </td>
@@ -65,7 +92,7 @@
                 <td>{{ dir[3] }}</td>
                 <td>
                     <img src={{ url_for("static", filename="download.png" ) }} width=25 height=25 />
-                    <a href="{{ url_for("download") }}?path={{ dir[0] }}">
+                    <a href={{ url_for("download") }}{{ dir[0] }}>
                         Download Zip
                     </a>
                 </td>
@@ -94,7 +121,7 @@
             <tr>
                 <td>
                     <img src={{ url_for("static", filename="file.png" ) }} width=25 height=25 />
-                    <a href={{ url_for("file") }}?path={{ file[0] }}>
+                    <a href={{ url_for("file") }}{{ file[0] }}>
                         {{ file[1] }}
                     </a>
                 </td>
@@ -102,7 +129,7 @@
                 <td>{{ file[3] }}</td>
                 <td>
                     <img src={{ url_for("static", filename="download.png" ) }} width=25 height=25 />
-                    <a href="{{ url_for("download") }}?path={{ file[0] }}">
+                    <a href={{ url_for("download") }}{{ file[0] }}>
                         Download
                     </a>
                 </td>
